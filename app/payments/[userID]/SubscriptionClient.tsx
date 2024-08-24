@@ -1,5 +1,3 @@
-// app/subscription/SubscriptionClient.tsx
-
 'use client';
 
 import React, { useState } from 'react';

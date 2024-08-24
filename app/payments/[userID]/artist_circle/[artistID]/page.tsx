@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import Decimal from 'decimal.js';  // You'd need to install this package
-import SubscriptionClient from './SubscriptionClient'
+import ArtistCircleClient from './ArtistCircleClient'
 
 export default async function ArtistCirclePaymentsPage({
   params,
@@ -47,12 +47,12 @@ export default async function ArtistCirclePaymentsPage({
 
   // If no errors, parse the amount and display the payment page
   const amount = new Decimal(amountString!);
-
-//   return (
-//     <div>
+  const duration = 34;
+  const description = "Artist Circle";
+  const type = "Artist Circle";
+  const typeId = "Artist Circle";
 //       Artist Payments Page for {userID} and artist ID {artistID} amount {amount.toFixed(2)}
-//     </div>
-//   );
 
-return <SubscriptionClient />
+
+return <ArtistCircleClient userID={userID} artistID={artistID} amount={amount.toNumber()} duration={duration} description={description} type={type} typeId={typeId}  />
 }
