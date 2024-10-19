@@ -6,8 +6,10 @@ import { PaymentScreen } from '@/components/PaymentScreen';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Decimal from 'decimal.js';
+import { Repository } from '@/types/payment';
 
 interface ArtistCircleClientProps {
+  apiData: Repository
   userID: string;
   artistID: string;
   amount: number;
@@ -18,17 +20,18 @@ interface ArtistCircleClientProps {
 }
 
 
-const ArtistCircleClient: React.FC<ArtistCircleClientProps> = ({ userID, artistID, amount, duration, description, type, typeId }) => {
+const ArtistCircleClient: React.FC<ArtistCircleClientProps> = ({ userID, artistID,apiData, amount, duration, description, type, typeId }) => {
   const [selectedPlan, setSelectedPlan] = useState<{
     amount: number;
+    apiData: Repository
     duration: number;
     description: string;
     type: string;
     typeId: string;
   } | null>(null);
 
-  const handlePayment = (amount: number, duration: number, description: string, type: string, typeId: string) => {
-    setSelectedPlan({ amount, duration, description, type, typeId });
+  const handlePayment = (amount: number,apiData: Repository, duration: number, description: string, type: string, typeId: string) => {
+    setSelectedPlan({ amount,apiData, duration, description, type, typeId });
   };
 
   const handleClosePaymentScreen = () => {
@@ -45,15 +48,15 @@ const ArtistCircleClient: React.FC<ArtistCircleClientProps> = ({ userID, artistI
           <Card className="w-full">
             <CardHeader>
               <CardTitle>Aritist Circle</CardTitle>
-              <CardDescription>Enjoy unlimited access for your artist</CardDescription>
+              <CardDescription>Enjoy unlimited access for your artist {apiData.full_name}</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">{amount.toLocaleString()} UGX</p>
             </CardContent>
-            <CardFooter>
+            <CardFooter>  
               <Button 
                 className="w-full" 
-                onClick={() => handlePayment(amount, duration, description, type, typeId)}
+                onClick={() => handlePayment(amount, apiData,duration, description, type, typeId)}
               >
                 Select Plan
               </Button>

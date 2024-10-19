@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import Decimal from 'decimal.js';  // You'd need to install this package
 import ArtistCircleClient from './ArtistCircleClient'
+import { Repository } from "@/types/payment";
+
 
 export default async function ArtistCirclePaymentsPage({
   params,
@@ -45,6 +47,10 @@ export default async function ArtistCirclePaymentsPage({
     );
   }
 
+  const res = await fetch('https://api.github.com/repos/vercel/next.js');
+  const data: Repository = await res.json();
+
+
   // If no errors, parse the amount and display the payment page
   const amount = new Decimal(amountString!);
   const duration = 34;
@@ -54,5 +60,5 @@ export default async function ArtistCirclePaymentsPage({
 //       Artist Payments Page for {userID} and artist ID {artistID} amount {amount.toFixed(2)}
 
 
-return <ArtistCircleClient userID={userID} artistID={artistID} amount={amount.toNumber()} duration={duration} description={description} type={type} typeId={typeId}  />
+return <ArtistCircleClient apiData={data} userID={userID} artistID={artistID} amount={amount.toNumber()} duration={duration} description={description} type={type} typeId={typeId}  />
 }
