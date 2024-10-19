@@ -51,7 +51,7 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
     if (consumer_key && consumer_secret) {
       requestAuthentication(consumer_key, consumer_secret);
     } else {
-      console.error('Whats your secrets :)');
+      console.error('Whats the password :)');
     }
   }, []);
 
@@ -97,6 +97,7 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
   useEffect(() => {
     if (paymentOrderResponse) {
       setRedirectUrl(paymentOrderResponse.redirect_url);
+      console.log("urs")
     }
   }, [paymentOrderResponse]);
 
