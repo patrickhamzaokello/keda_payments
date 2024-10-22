@@ -47,6 +47,7 @@ export interface Repository {
 
   export interface MwonyaPaymentOrderRequest {
     orderTrackingId: string;
+    description: string;
     userId: string;
     amount: number;
     currency: string;
@@ -61,3 +62,38 @@ export interface Repository {
     planDuration: number;
     planDescription: string;
   }
+
+  export type PaymentOrderRequest = {
+    id: string;
+    currency: string;
+    amount: number;
+    description: string;
+    callback_url: string;
+    redirect_mode: string;
+    cancellation_url: string;
+    notification_id: string;
+    branch: string;
+    billing_address: {
+      email_address: string;
+      phone_number: string;
+      country_code: string;
+      first_name: string;
+      middle_name?: string;
+      last_name: string;
+      line_1: string;
+      line_2?: string;
+      city?: string;
+      state?: string;
+      postal_code?: string;
+      zip_code?: string;
+    };
+  };
+
+  export interface PaymentIPNRegister {
+    url: string;
+    ipnNotificationType: string;
+  }
+  export interface TokenInfo {
+    token: string;
+    expiryDate: Date;
+  } 

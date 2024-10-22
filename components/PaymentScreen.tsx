@@ -3,7 +3,6 @@
 'use client';
 
 import React, { useEffect,useState } from 'react';
-import { usePayment } from '../hooks/usePayment';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 
@@ -115,7 +114,7 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
     return (
       <Dialog open onOpenChange={onClose}>
         <DialogContent>
-          <div>Error: {error.message}</div>
+          <div>2Error: {error.message}</div>
         </DialogContent>
       </Dialog>
     );
