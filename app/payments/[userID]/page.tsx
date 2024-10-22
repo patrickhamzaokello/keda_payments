@@ -79,7 +79,7 @@ export default function UserPaymentsPage({
     try {
       const orderDetails = createOrderRequest(productDetails);
       
-      const response = await fetch('/api/payments', {
+      const response = await fetch('https://payments.mwonya.com/api/payments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

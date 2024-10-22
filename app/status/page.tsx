@@ -36,7 +36,7 @@ export default function CheckStatusPage() {
         setError(null);
 
         try {
-            const response = await fetch('/api/payment_status', {
+            const response = await fetch('https://payments.mwonya.com/api/payment_status', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
