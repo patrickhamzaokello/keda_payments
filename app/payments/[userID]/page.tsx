@@ -1,8 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { paymentService } from '@/services/paymentService';
 import { PaymentOrderRequest } from "@/types/payment";
-import { PaymentServiceError } from '@/lib/PaymentServiceError';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
@@ -21,12 +19,10 @@ export default function UserPaymentsPage({
   params: { userID: string };
 }) {
   const { userID } = params;
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [processingPayment, setProcessingPayment] = useState(false);
 
-  // Mock product details - In real app, fetch this from API/database
   const productDetails: ProductDetails = {
     name: "Premium Subscription",
     price: 500.00,
@@ -76,30 +72,26 @@ export default function UserPaymentsPage({
     setError(null);
 
     try {
-      const consumerKey = process.env.NEXT_PUBLIC_CONSUMER_KEY;
-      const consumerSecret = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
-
-      if (!consumerKey || !consumerSecret) {
-        throw new Error("Payment configuration error. Please contact support.");
-      }
-
-      await paymentService.authenticate({
-        consumer_key: consumerKey,
-        consumer_secret: consumerSecret
+      const orderDetails = createOrderRequest(productDetails);
+      
+      const response = await fetch('/api/payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderDetails }),
       });
 
-      const orderResponse = await paymentService.submitOrder(
-        createOrderRequest(productDetails)
-      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Payment processing failed');
+      }
 
+      const orderResponse = await response.json();
       setRedirectUrl(orderResponse.redirect_url);
     } catch (error) {
       console.error('Payment submission error:', error);
-      setError(
-        error instanceof PaymentServiceError
-          ? error.message
-          : 'An unexpected error occurred. Please try again.'
-      );
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setProcessingPayment(false);
     }
@@ -109,7 +101,7 @@ export default function UserPaymentsPage({
     if (redirectUrl) {
       const timer = setTimeout(() => {
         window.location.href = redirectUrl;
-      }, 2000); // Give user 2 seconds to see the success message
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [redirectUrl]);
@@ -135,8 +127,8 @@ export default function UserPaymentsPage({
           </h1>
         </CardHeader>
         <CardContent>
-          {/* Product Details */}
           <div className="space-y-4">
+            {/* Product Details */}
             <div className="bg-gray-50 p-4 rounded-lg">
               <h2 className="font-semibold text-lg mb-2">
                 {productDetails.name}
