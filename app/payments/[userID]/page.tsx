@@ -25,10 +25,15 @@ export default function UserPaymentsPage({
 
   const productDetails: ProductDetails = {
     name: "Premium Subscription",
-    price: 500.00,
+    price: 50900.00,
     currency: "UGX",
     description: "1 Month Premium Access to All Features"
   };
+
+  const formattedPrice = new Intl.NumberFormat('en-UG', {
+    style: 'currency',
+    currency: productDetails.currency
+  }).format(productDetails.price);
 
   const generateOrderId = (): string => {
     const timestamp = new Date()
@@ -45,7 +50,7 @@ export default function UserPaymentsPage({
     amount: 500.00,
     cancellation_url: "",
     description: "Payment description goes here",
-    callback_url: "https://www.myapplication.com/response-page",
+    callback_url: "https://payments.mwonya.com/",
     redirect_mode: "",  // Optional field that could be filled based on your requirements
     notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
     branch: "Store Name - HQ",
@@ -137,7 +142,7 @@ export default function UserPaymentsPage({
                 {productDetails.description}
               </p>
               <div className="text-xl font-bold">
-                {productDetails.currency} {productDetails.price.toFixed(2)}
+                {formattedPrice}
               </div>
             </div>
 
