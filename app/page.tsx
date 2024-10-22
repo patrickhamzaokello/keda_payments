@@ -69,7 +69,7 @@ export default function Component() {
               <div className="flex flex-col items-center text-center">
                 <CheckCircle className="h-12 w-12 text-primary mb-4" />
                 <h3 className="text-xl font-bold mb-2">99.99% Uptime</h3>
-                <p className="text-gray-500">Reliable service that's always there when you need it.</p>
+                <p className="text-gray-500">Reliable service that&apos;s always there when you need it.</p>
               </div>
             </div>
           </div>
