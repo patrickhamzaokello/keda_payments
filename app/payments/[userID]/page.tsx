@@ -25,7 +25,7 @@ export default function UserPaymentsPage({
 
   const productDetails: ProductDetails = {
     name: "Premium Subscription",
-    price: 50900.00,
+    price: 500.00,
     currency: "UGX",
     description: "1 Month Premium Access to All Features"
   };
