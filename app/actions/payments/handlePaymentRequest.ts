@@ -3,6 +3,10 @@ import { NextResponse } from 'next/server';
 import { paymentService } from '@/services/paymentService';
 import { PaymentOrderRequest } from '@/types/payment';
 
+export async function sanitizeData(data:any) {
+  return JSON.parse(JSON.stringify(data));
+  }
+
 export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
   try {
 
@@ -24,16 +28,14 @@ export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
 
     // Submit the order
     const orderResponse = await paymentService.submitOrder(orderDetails);
-    const plainOrderResponse = {
-      redirect_url: orderResponse.redirect_url,
-      // Add other necessary properties from orderResponse
-    };
 
-    return NextResponse.json({
+    const sanitizedResponse = await sanitizeData({
       success: true,
-      ...plainOrderResponse,
+      redirect_url: orderResponse.redirect_url,
       // Include any other necessary data from orderResponse
     });
+
+    return NextResponse.json(sanitizedResponse);
   } catch (error) {
     console.error('Payment API error:', error);
     return NextResponse.json(
