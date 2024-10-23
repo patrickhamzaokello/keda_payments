@@ -9,9 +9,8 @@ export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
     const consumerSecret = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET;
 
     if (!consumerKey || !consumerSecret) {
-      console.log("hello");
       return NextResponse.json(
-        { error: 'Payment configuration error' },
+        { error: 'Payment configuration error ' },
         { status: 500 }
       );
     }
