@@ -24,10 +24,14 @@ export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
 
     // Submit the order
     const orderResponse = await paymentService.submitOrder(orderDetails);
+    const plainOrderResponse = {
+      redirect_url: orderResponse.redirect_url,
+      // Add other necessary properties from orderResponse
+    };
 
     return NextResponse.json({
       success: true,
-      redirect_url: orderResponse.redirect_url,
+      ...plainOrderResponse,
       // Include any other necessary data from orderResponse
     });
   } catch (error) {
