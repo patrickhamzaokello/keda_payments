@@ -1,4 +1,4 @@
-"use server"
+
 import {paymentService} from '@/services/paymentService';
 import {PaymentOrderRequest} from '@/types/payment';
 
