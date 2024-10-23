@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Decimal from 'decimal.js';
+import { handlePaymentRequest } from '@/app/actions/payments/handlePaymentRequest';
 
 interface ProductDetails {
   name: string;
@@ -82,23 +83,16 @@ export default function UserPaymentsPage({
     setError(null);
 
     try {
-      const orderDetails = createOrderRequest(productDetails);
       
-      const response = await fetch('https://payments.mwonya.com/api/payments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orderDetails }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Payment processing failed');
+      const orderDetails = createOrderRequest(productDetails);
+      // Call the server action
+      const response = await handlePaymentRequest(orderDetails);
+      const orderResponse = await response.json(); 
+      if (orderResponse.success) {
+        setRedirectUrl(orderResponse.redirect_url);
+      } else {
+        setError(orderResponse.error || 'An unexpected error occurred');
       }
-
-      const orderResponse = await response.json();
-      setRedirectUrl(orderResponse.redirect_url);
     } catch (error) {
       console.error('Payment submission error:', error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');

@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { paymentService } from '@/services/paymentService';
+import { PaymentOrderRequest } from '@/types/payment';
 
-export async function POST(request: Request) {
+export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
   try {
-    const body = await request.json();
-    const { orderDetails } = body;
 
-    const consumerKey = process.env.PESAPAL_CONSUMER_KEY;
-    const consumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
+    const consumerKey = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY;
+    const consumerSecret = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET;
 
     if (!consumerKey || !consumerSecret) {
+      console.log("hello");
       return NextResponse.json(
         { error: 'Payment configuration error' },
         { status: 500 }
@@ -25,11 +25,15 @@ export async function POST(request: Request) {
     // Submit the order
     const orderResponse = await paymentService.submitOrder(orderDetails);
 
-    return NextResponse.json(orderResponse);
+    return NextResponse.json({
+      success: true,
+      redirect_url: orderResponse.redirect_url,
+      // Include any other necessary data from orderResponse
+    });
   } catch (error) {
     console.error('Payment API error:', error);
     return NextResponse.json(
-      { error: 'Payment processing failed' },
+      { success: false, error: 'Payment processing failed' },
       { status: 500 }
     );
   }
