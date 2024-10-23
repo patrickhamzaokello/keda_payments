@@ -81,13 +81,11 @@ export default function UserPaymentsPage({
       const orderDetails = createOrderRequest(productDetails);
       // Call the server action
       const response = await handlePaymentRequest(orderDetails);
-      const orderResponse = await response.json(); 
-      if (orderResponse.success) {
-        setRedirectUrl(orderResponse.redirect_url);
+      if (response.success) {
+        setRedirectUrl(response.redirect_url || null);
       } else {
-        setError(orderResponse.error || 'An unexpected error occurred');
+        setError(response.error || 'An unexpected error occurred');
       }
-
     } catch (error) {
       console.error('Payment submission error:', error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');

@@ -1,46 +1,33 @@
 "use server"
-import { NextResponse } from 'next/server';
-import { paymentService } from '@/services/paymentService';
-import { PaymentOrderRequest } from '@/types/payment';
+import {paymentService} from '@/services/paymentService';
+import {PaymentOrderRequest} from '@/types/payment';
 
-export async function sanitizeData(data:any) {
-  return JSON.parse(JSON.stringify(data));
-  }
 
 export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
-  try {
+    try {
 
-    const consumerKey = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY;
-    const consumerSecret = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET;
+        const consumerKey = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY;
+        const consumerSecret = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET;
 
-    if (!consumerKey || !consumerSecret) {
-      return NextResponse.json(
-        { error: 'Payment configuration error ' },
-        { status: 500 }
-      );
+        if (!consumerKey || !consumerSecret) {
+            return {success: false, error: 'Payment configuration error'};
+        }
+
+        // Authenticate with Pesapal
+        await paymentService.authenticate({
+            consumer_key: consumerKey,
+            consumer_secret: consumerSecret
+        });
+
+        // Submit the order
+        const orderResponse = await paymentService.submitOrder(orderDetails);
+
+        return {
+            success: true,
+            redirect_url: orderResponse.redirect_url,
+        };
+    } catch (error) {
+        console.error('Payment API error:', error);
+        return {success: false, error: 'Payment processing failed', status: 500};
     }
-
-    // Authenticate with Pesapal
-    await paymentService.authenticate({
-      consumer_key: consumerKey,
-      consumer_secret: consumerSecret
-    });
-
-    // Submit the order
-    const orderResponse = await paymentService.submitOrder(orderDetails);
-
-    const sanitizedResponse = await sanitizeData({
-      success: true,
-      redirect_url: orderResponse.redirect_url,
-      // Include any other necessary data from orderResponse
-    });
-
-    return NextResponse.json(sanitizedResponse);
-  } catch (error) {
-    console.error('Payment API error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Payment processing failed' },
-      { status: 500 }
-    );
-  }
 }
