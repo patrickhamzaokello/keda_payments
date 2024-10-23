@@ -1,3 +1,4 @@
+"use server"
 import { NextResponse } from 'next/server';
 import { paymentService } from '@/services/paymentService';
 import { PaymentOrderRequest } from '@/types/payment';
