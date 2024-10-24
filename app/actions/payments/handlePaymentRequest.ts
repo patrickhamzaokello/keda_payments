@@ -5,22 +5,23 @@ import {PaymentOrderRequest} from '@/types/payment';
 
 export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
     try {
-
-        const consumerKey = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY;
-        const consumerSecret = process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET;
-
-        if (!consumerKey || !consumerSecret) {
-            return {success: false, error: 'Payment configuration error'};
-        }
-
-        // Authenticate with Pesapal
-        await paymentService.authenticate({
-            consumer_key: consumerKey,
-            consumer_secret: consumerSecret
-        });
+        const credentials = {
+            consumer_key: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY,
+            consumer_secret: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET
+          };
+      
+          if (!credentials.consumer_key || !credentials.consumer_secret) {
+            return { success: false, error: 'Payment configuration error' };
+          }
+      
+          // Authenticate with Pesapal
+          await paymentService.authenticate({
+            consumer_key: credentials.consumer_key,
+            consumer_secret: credentials.consumer_secret
+          });
 
         // Submit the order
-        const orderResponse = await paymentService.submitOrder(orderDetails);
+        const orderResponse = await paymentService.submitOrder(orderDetails,credentials);
 
         return {
             success: true,

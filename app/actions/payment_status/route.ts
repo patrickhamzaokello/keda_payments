@@ -6,24 +6,24 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { trackingId, merchantReference } = body;
 
-    const consumerKey = process.env.PESAPAL_CONSUMER_KEY;
-    const consumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
+    const credentials = {
+      consumer_key: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY,
+      consumer_secret: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET
+    };
 
-    if (!consumerKey || !consumerSecret) {
-      return NextResponse.json(
-        { error: 'Payment configuration error' },
-        { status: 500 }
-      );
+    if (!credentials.consumer_key || !credentials.consumer_secret) {
+      return { success: false, error: 'Payment configuration error' };
     }
 
     // Authenticate with Pesapal
     await paymentService.authenticate({
-      consumer_key: consumerKey,
-      consumer_secret: consumerSecret
+      consumer_key: credentials.consumer_key,
+      consumer_secret: credentials.consumer_secret
     });
 
+
     // Submit the order id to get status
-    const orderStatusResponse = await paymentService.getOrderStatus(trackingId);
+    const orderStatusResponse = await paymentService.getOrderStatus(trackingId, credentials);
     console.log(orderStatusResponse);
 
     return NextResponse.json(orderStatusResponse);
