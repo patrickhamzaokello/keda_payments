@@ -42,16 +42,16 @@ export default function CheckStatusPage() {
                 throw new Error(response.error  || 'Failed to check Payment status');
             }
 
-            const statusResponse = await response.orderStatusResponse;
-            setOrderStatus(statusResponse?.statusCode); // Assuming the response has a 'status' field
-            setPayment_account(statusResponse?.paymentAccount);
-            setPayment_amount(statusResponse?.amount.toString());
-            setPayment_method(statusResponse?.paymentMethod);
-            setConfirmation_code(statusResponse?.confirmationCode);
-            setOrder_tracking_id(statusResponse?.orderTrackingId);
+            const statusResponse = response;
+            setOrderStatus(statusResponse.statusCode?.toString()); // Assuming the response has a 'status' field
+            setPayment_account(statusResponse.paymentAccount);
+            setPayment_amount(statusResponse.amount?.toString());
+            setPayment_method(statusResponse.paymentMethod);
+            setConfirmation_code(statusResponse.confirmationCode);
+            setOrder_tracking_id(statusResponse.orderTrackingId);
             setMerchant_reference("merchange_no");
             setPayment_message("message");
-            setTransaction_date(new Date(statusResponse?.createdDate).toLocaleString());
+            setTransaction_date(statusResponse.createdDate);
 
         } catch (error) {
             console.error('Error fetching Payment status:', error);

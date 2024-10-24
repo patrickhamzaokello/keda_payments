@@ -24,7 +24,15 @@ export async function handlePaymentStatusRequest(trackingId: string) {
 
         return {
             success: true,
-            orderStatusResponse: orderStatusResponse,
+            orderTrackingId: orderStatusResponse.orderTrackingId,
+            statusCode: orderStatusResponse.statusCode,
+            amount: orderStatusResponse.amount,
+            currency: orderStatusResponse.currency,
+            payment_status_description: orderStatusResponse.payment_status_description,
+            paymentAccount: orderStatusResponse.paymentAccount,
+            paymentMethod: orderStatusResponse.paymentMethod,
+            confirmationCode: orderStatusResponse.confirmationCode,
+            createdDate: orderStatusResponse.createdDate,
         };
     } catch (error) {
         console.error('Payment API error:', error);
