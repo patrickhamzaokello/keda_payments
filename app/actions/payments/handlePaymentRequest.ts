@@ -6,8 +6,8 @@ import {PaymentOrderRequest} from '@/types/payment';
 export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
     try {
         const credentials = {
-            consumer_key: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY,
-            consumer_secret: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET
+           consumer_key: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY?? "",
+            consumer_secret: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET?? ""
           };
       
           if (!credentials.consumer_key || !credentials.consumer_secret) {
