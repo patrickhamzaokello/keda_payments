@@ -1,21 +1,29 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
-import { PaymentServiceError } from '@/lib/PaymentServiceError';
 import { 
   PaymentAuth,
   TokenInfo,
-  PaymentIPNResponse, 
-  PaymentOrderResponse, 
+  PaymentIPNResponse,
+  PaymentOrderResponse,
   PaymentOrderStatus,
   PaymentOrderRequest,
-  PaymentIPNRegister
+  PaymentIPNRegister,
+  PaymentError
 } from '../types/payment';
-
+import { PaymentServiceError } from '@/services/PaymentServiceError';
+// import { PaymentServiceError } from '@/lib/PaymentServiceError';
 
 export class PaymentService {
   private readonly API_BASE_URL = 'https://pay.pesapal.com/v3/';
   private tokenInfo?: TokenInfo;
+  private lastUsedCredentials?: {
+    consumer_key: string;
+    consumer_secret: string;
+  };
 
-  private getAxiosInstance(requiresAuth: boolean = false): AxiosInstance {     
+  private async fetchWithConfig<T>(
+    endpoint: string,
+    options: RequestInit = {},
+    requiresAuth: boolean = false
+  ): Promise<T> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache',
@@ -37,28 +45,49 @@ export class PaymentService {
       headers['Authorization'] = `Bearer ${this.tokenInfo.token}`;
     }
 
-    return axios.create({
-      baseURL: this.API_BASE_URL,
-      headers,
-      timeout: 10000,
-    });
-  }
+    const url = `${this.API_BASE_URL}${endpoint}`;
+    const config: RequestInit = {
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers,
+      },
+    };
 
-  private async handleRequest<T>(
-    requestFn: () => Promise<T>,
-    errorMessage: string
-  ): Promise<T> {
     try {
-      return await requestFn();
-    } catch (error) {
-      if (error instanceof AxiosError) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      const response = await fetch(url, {
+        ...config,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData: PaymentError = await response.json()
+          .catch(() => ({ message: 'Failed to parse error response' }));
+        
         throw new PaymentServiceError(
-          `${errorMessage}: ${error.message}`,
-          error.response?.status,
-          error.response?.data
+          errorData.message || response.statusText,
+          response.status,
+          errorData
         );
       }
-      throw new PaymentServiceError(`${errorMessage}: Unknown error occurred`);
+
+      return await response.json();
+    } catch (error) {
+      if (error instanceof PaymentServiceError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new PaymentServiceError('Request timeout');
+        }
+        throw new PaymentServiceError(error.message);
+      }
+      throw new PaymentServiceError('Unknown error occurred');
     }
   }
 
@@ -72,7 +101,6 @@ export class PaymentService {
 
   private async ensureValidToken(): Promise<void> {
     if (this.isTokenExpired()) {
-      // Re-authenticate if we have stored credentials
       if (this.lastUsedCredentials) {
         await this.authenticate(this.lastUsedCredentials);
       } else {
@@ -83,32 +111,31 @@ export class PaymentService {
     }
   }
 
-  // Store the last used credentials for potential re-authentication
-  private lastUsedCredentials?: {
-    consumer_key: string;
-    consumer_secret: string;
-  };
-
   async authenticate(credentials: { 
     consumer_key: string; 
     consumer_secret: string 
   }): Promise<PaymentAuth> {
-    return this.handleRequest(
-      async () => {
-        const response = await this.getAxiosInstance(false)
-          .post<PaymentAuth>('api/Auth/RequestToken', credentials);
-        
-        // Store token info and credentials
-        this.tokenInfo = {
-          token: response.data.token,
-          expiryDate: new Date(response.data.expiryDate)
-        };
-        this.lastUsedCredentials = credentials;
+    try {
+      const response = await this.fetchWithConfig<PaymentAuth>(
+        'api/Auth/RequestToken',
+        {
+          method: 'POST',
+          body: JSON.stringify(credentials),
+        }
+      );
 
-        return response.data;
-      },
-      'Authentication failed'
-    );
+      this.tokenInfo = {
+        token: response.token,
+        expiryDate: new Date(response.expiryDate)
+      };
+      this.lastUsedCredentials = credentials;
+
+      return response;
+    } catch (error) {
+      throw new PaymentServiceError(
+        `Authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   async registerIPN(
@@ -116,14 +143,20 @@ export class PaymentService {
   ): Promise<PaymentIPNResponse> {
     await this.ensureValidToken();
     
-    return this.handleRequest(
-      async () => {
-        const response = await this.getAxiosInstance(true)
-          .post<PaymentIPNResponse>('api/URLSetup/RegisterIPN', ipnDetails);
-        return response.data;
-      },
-      'IPN registration failed'
-    );
+    try {
+      return await this.fetchWithConfig<PaymentIPNResponse>(
+        'api/URLSetup/RegisterIPN',
+        {
+          method: 'POST',
+          body: JSON.stringify(ipnDetails),
+        },
+        true
+      );
+    } catch (error) {
+      throw new PaymentServiceError(
+        `IPN registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   async submitOrder(
@@ -131,17 +164,20 @@ export class PaymentService {
   ): Promise<PaymentOrderResponse> {
     await this.ensureValidToken();
 
-    return this.handleRequest(
-      async () => {
-        const response = await this.getAxiosInstance(true)
-          .post<PaymentOrderResponse>(
-            'api/Transactions/SubmitOrderRequest', 
-            orderRequest
-          );
-        return response.data;
-      },
-      'Order submission failed'
-    );
+    try {
+      return await this.fetchWithConfig<PaymentOrderResponse>(
+        'api/Transactions/SubmitOrderRequest',
+        {
+          method: 'POST',
+          body: JSON.stringify(orderRequest),
+        },
+        true
+      );
+    } catch (error) {
+      throw new PaymentServiceError(
+        `Order submission failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   async getOrderStatus(
@@ -149,24 +185,25 @@ export class PaymentService {
   ): Promise<PaymentOrderStatus> {
     await this.ensureValidToken();
 
-    return this.handleRequest(
-      async () => {
-        const response = await this.getAxiosInstance(true)
-          .get<PaymentOrderStatus>(
-            `api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`
-          );
-        return response.data;
-      },
-      'Failed to get order status'
-    );
+    try {
+      return await this.fetchWithConfig<PaymentOrderStatus>(
+        `api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`,
+        {
+          method: 'GET',
+        },
+        true
+      );
+    } catch (error) {
+      throw new PaymentServiceError(
+        `Failed to get order status: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
-  // Method to check if service is authenticated
   isAuthenticated(): boolean {
     return !!this.tokenInfo && !this.isTokenExpired();
   }
 
-  // Method to get token expiry time
   getTokenExpiryTime(): Date | null {
     return this.tokenInfo?.expiryDate ?? null;
   }
