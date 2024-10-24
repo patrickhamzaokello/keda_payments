@@ -43,15 +43,15 @@ export default function CheckStatusPage() {
             }
 
             const statusResponse = response;
-            setOrderStatus(statusResponse.statusCode?.toString()); // Assuming the response has a 'status' field
-            setPayment_account(statusResponse.paymentAccount);
-            setPayment_amount(statusResponse.amount?.toString());
-            setPayment_method(statusResponse.paymentMethod);
-            setConfirmation_code(statusResponse.confirmationCode);
-            setOrder_tracking_id(statusResponse.orderTrackingId);
+            setOrderStatus(statusResponse.statusCode?.toString() ?? null); // Assuming the response has a 'status' field
+            setPayment_account(statusResponse.paymentAccount ?? null);
+            setPayment_amount(statusResponse.amount?.toString() ?? null);
+            setPayment_method(statusResponse.paymentMethod ?? null);
+            setConfirmation_code(statusResponse.confirmationCode ?? null);
+            setOrder_tracking_id(statusResponse.orderTrackingId ?? null);
             setMerchant_reference("merchange_no");
             setPayment_message("message");
-            setTransaction_date(statusResponse.createdDate);
+            setTransaction_date(statusResponse.createdDate ?? null);
 
         } catch (error) {
             console.error('Error fetching Payment status:', error);

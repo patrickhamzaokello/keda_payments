@@ -6,7 +6,7 @@ import {
   PaymentIPNRegister,
   PaymentIPNResponse,
   PaymentOrderStatus
-} from '../types/payment';
+} from '@/types/payment';
 import { PaymentServiceError } from '@/services/PaymentServiceError';
 // import { PaymentServiceError } from '@/lib/PaymentServiceError';
 
