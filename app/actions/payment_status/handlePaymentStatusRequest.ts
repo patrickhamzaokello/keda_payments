@@ -15,8 +15,8 @@ export async function handlePaymentStatusRequest(trackingId: string) {
       
           // Authenticate with Pesapal
           await paymentService.authenticate({
-            consumer_key: credentials.consumer_key,
-            consumer_secret: credentials.consumer_secret
+            consumer_key: credentials.consumer_key?? "",
+            consumer_secret: credentials.consumer_secret?? ""
           });
 
         // Submit the order
