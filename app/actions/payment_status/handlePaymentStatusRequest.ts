@@ -5,8 +5,8 @@ import {paymentService} from '@/services/paymentService';
 export async function handlePaymentStatusRequest(trackingId: string) {
     try {
         const credentials = {
-            consumer_key: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY,
-            consumer_secret: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET
+            consumer_key: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_KEY?? "",
+            consumer_secret: process.env.NEXT_PUBLIC_PESAPAL_CONSUMER_SECRET?? ""
           };
       
           if (!credentials.consumer_key || !credentials.consumer_secret) {
@@ -15,8 +15,8 @@ export async function handlePaymentStatusRequest(trackingId: string) {
       
           // Authenticate with Pesapal
           await paymentService.authenticate({
-            consumer_key: credentials.consumer_key?? "",
-            consumer_secret: credentials.consumer_secret?? ""
+            consumer_key: credentials.consumer_key,
+            consumer_secret: credentials.consumer_secret
           });
 
         // Submit the order
