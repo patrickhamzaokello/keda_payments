@@ -1,11 +1,11 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { PaymentOrderRequest } from "@/types/payment";
+import { PaymentOrderRequest, MwonyaPaymentDetails } from "@/types/payment";
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { handlePaymentRequest } from '@/app/actions/payments/handlePaymentRequest';
+import { handlePaymentRequest, postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
 
 interface ProductDetails {
   name: string;
@@ -45,8 +45,10 @@ export default function UserPaymentsPage({
     return `ORD${timestamp}${randomNum}`;
   };
 
+  const created_order_id = generateOrderId();
+
   const paymentRequestData: PaymentOrderRequest = {
-    id: generateOrderId(),
+    id: created_order_id,
     currency: "UGX",
     amount: 500.00,
     cancellation_url: "",
@@ -71,18 +73,35 @@ export default function UserPaymentsPage({
     }
   };
 
-  const createOrderRequest = (product: ProductDetails): PaymentOrderRequest => (paymentRequestData);
+  const paymentMwonyaData: MwonyaPaymentDetails = {
+    orderTrackingId: created_order_id,
+    userId: userID,
+    amount: 2500,
+    currency: "UGX",
+    subscriptionType: "1 day pass",
+    subscriptionTypeId: "1day",
+    paymentCreatedDate: new Date().toISOString(),
+    planDuration: 1,
+    planDescription: "payment for subscription"
+  };
+
+
+
 
   const handlePaymentSubmission = async () => {
     setProcessingPayment(true);
     setError(null);
 
     try {
-      const orderDetails = createOrderRequest(productDetails);
-      // Call the server action
-      const response = await handlePaymentRequest(orderDetails);
+      const response = await postMwonyaOrder(paymentMwonyaData)
       if (response.success) {
-        setRedirectUrl(response.redirect_url || null);
+        // Call the server action
+        const response = await handlePaymentRequest(paymentRequestData);
+        if (response.success) {
+          setRedirectUrl(response.redirect_url || null);
+        } else {
+          setError(response.error || 'An unexpected error occurred');
+        }
       } else {
         setError(response.error || 'An unexpected error occurred');
       }

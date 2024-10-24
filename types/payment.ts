@@ -17,6 +17,11 @@ export interface PaymentAuth {
     error: string | null;
     status: string;
   }
+
+  export interface MwonyaPostPaymentResponse {
+    error: boolean;
+    message: string;
+  }
   
   export interface ResultResponse {
     // Define the structure of your ResultResponse
@@ -57,19 +62,13 @@ export interface Repository {
     full_name: string;
 }
 
-  export interface MwonyaPaymentOrderRequest {
+  export interface MwonyaPaymentDetails {
     orderTrackingId: string;
-    description: string;
     userId: string;
     amount: number;
     currency: string;
     subscriptionType: string;
     subscriptionTypeId: string;
-    statusCode: number;
-    paymentStatusDescription: string;
-    paymentAccount: string;
-    paymentMethod: string;
-    confirmationCode: string;
     paymentCreatedDate: string;
     planDuration: number;
     planDescription: string;
