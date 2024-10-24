@@ -5,6 +5,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Loader } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { handlePaymentStatusRequest } from '../actions/payment_status/handlePaymentStatusRequest';
 
 export default function CheckStatusPage() {
     const searchParams = useSearchParams(); // Used to get query params from the URL
@@ -36,29 +37,21 @@ export default function CheckStatusPage() {
         setError(null);
 
         try {
-            const response = await fetch('https://payments.mwonya.com/api/payment_status', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ trackingId, merchantReference }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to check Payment status');
+            const response = await handlePaymentStatusRequest(trackingId);            
+            if (!response.success) {
+                throw new Error(response.error  || 'Failed to check Payment status');
             }
 
-            const statusResponse = await response.json();
-            setOrderStatus(statusResponse.status); // Assuming the response has a 'status' field
-            setPayment_account(statusResponse.payment_account);
-            setPayment_amount(statusResponse.amount.toString());
-            setPayment_method(statusResponse.payment_method);
-            setConfirmation_code(statusResponse.confirmation_code);
-            setOrder_tracking_id(statusResponse.order_tracking_id);
-            setMerchant_reference(statusResponse.merchant_reference);
-            setPayment_message(statusResponse.message);
-            setTransaction_date(new Date(statusResponse.created_date).toLocaleString());
+            const statusResponse = await response.orderStatusResponse;
+            setOrderStatus(statusResponse?.statusCode); // Assuming the response has a 'status' field
+            setPayment_account(statusResponse?.paymentAccount);
+            setPayment_amount(statusResponse?.amount.toString());
+            setPayment_method(statusResponse?.paymentMethod);
+            setConfirmation_code(statusResponse?.confirmationCode);
+            setOrder_tracking_id(statusResponse?.orderTrackingId);
+            setMerchant_reference("merchange_no");
+            setPayment_message("message");
+            setTransaction_date(new Date(statusResponse?.createdDate).toLocaleString());
 
         } catch (error) {
             console.error('Error fetching Payment status:', error);
