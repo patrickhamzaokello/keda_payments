@@ -48,7 +48,7 @@ export async function postMwonyaOrder(paymentDetails: MwonyaPaymentDetails) {
     };
   } catch (error) {
     console.error('Payment API error:', error);
-    return { success: false, error: 'Payment processing failed', status: 500 };
+    return { success: false, error: error || 'Posting to Mwonya Failed', status: 500 };
   }
 
 }
