@@ -23,15 +23,27 @@ export interface PaymentAuth {
   }
   
   export interface PaymentOrderStatus {
-    orderTrackingId: string;
-    statusCode: number;
+    payment_method: string;
     amount: number;
-    currency: string;
+    created_date: string;
+    confirmation_code: string;
+    order_tracking_id: string;
     payment_status_description: string;
-    paymentAccount: string;
-    paymentMethod: string;
-    confirmationCode: string;
-    createdDate: string;
+    description: string | null;
+    message: string;
+    payment_account: string;
+    call_back_url: string;
+    status_code: number;
+    merchant_reference: string;
+    account_number: string | null;
+    payment_status_code: string;
+    currency: string;
+    error: {
+        error_type: string | null;
+        code: string | null;
+        message: string | null;
+    };
+    status: string;
   }
   
   export interface PaymentError {

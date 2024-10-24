@@ -56,7 +56,7 @@ export default function UserPaymentsPage({
     amount: 500.00,
     cancellation_url: "",
     description: "Payment description goes here",
-    callback_url: "https://payments.mwonya.com/",
+    callback_url: "https://payments.mwonya.com/confirm_payment",
     redirect_mode: "",  // Optional field that could be filled based on your requirements
     notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
     branch: "Store Name - HQ",

@@ -164,7 +164,7 @@ export class PaymentService {
           return await this.fetchWithConfig<PaymentOrderStatus>(
               `api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`,
               {
-                  method: 'POST',
+                  method: 'GET',
               },
               credentials
           );
