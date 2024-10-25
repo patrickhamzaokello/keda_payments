@@ -72,7 +72,7 @@ import {
         
         try {
           return await this.fetchWithConfig<MwonyaPostPaymentResponse>(
-            'post_order_details.php',
+            'capture_payment_request.php',
             {
               method: 'POST',
               body: JSON.stringify(ipnDetails),

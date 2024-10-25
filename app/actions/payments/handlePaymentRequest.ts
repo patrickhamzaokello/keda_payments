@@ -39,6 +39,7 @@ export async function postMwonyaOrder(paymentDetails: MwonyaPaymentDetails) {
 
   try {
   
+    console.log({paymentDetails})
     // Submit order to mwonya
     const response = await mwonyaService.postPaymentDetailsToMwonya(paymentDetails);
 
