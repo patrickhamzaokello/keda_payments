@@ -44,7 +44,7 @@ export async function postMwonyaOrder(paymentDetails: MwonyaPaymentDetails) {
     const response = await mwonyaService.postPaymentDetailsToMwonya(paymentDetails);
 
     return {
-      success: response.error,      
+      success: !response.error,      
       message: response.message,
     };
   } catch (error) {
