@@ -1,12 +1,12 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { PaymentOrderRequest } from "@/types/payment";
+import { PaymentOrderRequest,MwonyaPaymentDetails } from "@/types/payment";
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Decimal from 'decimal.js';
-import { handlePaymentRequest } from '@/app/actions/payments/handlePaymentRequest';
+import { handlePaymentRequest,postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
 
 interface ProductDetails {
   name: string;
@@ -50,6 +50,8 @@ export default function UserPaymentsPage({
     return `ORD${timestamp}${randomNum}`;
   };
 
+  const created_order_id = generateOrderId();
+
   const paymentRequestData: PaymentOrderRequest = {
     id: generateOrderId(),
     currency: "UGX",
@@ -76,21 +78,36 @@ export default function UserPaymentsPage({
     }
   };
 
-  const createOrderRequest = (product: ProductDetails): PaymentOrderRequest => (paymentRequestData);
+  const paymentMwonyaData: MwonyaPaymentDetails = {
+    orderTrackingId: created_order_id,
+    userId: userID,
+    amount: 2500,
+    currency: "UGX",
+    subscriptionType: artistID,
+    subscriptionTypeId: "1day",
+    paymentCreatedDate: new Date().toISOString(),
+    planDuration: 1,
+    planDescription: "artist circle"
+  };
+
+
 
   const handlePaymentSubmission = async () => {
     setProcessingPayment(true);
     setError(null);
 
     try {
-      const orderDetails = createOrderRequest(productDetails);
-      // Call the server action
-      const response = await handlePaymentRequest(orderDetails);
-      if (response.success) {
-        setRedirectUrl(response.redirect_url || null);
-      } else {
-        setError(response.error || 'An unexpected error occurred');
+      const mwonyaResponse = await postMwonyaOrder(paymentMwonyaData)
+      if (!mwonyaResponse.success) {
+        setError(mwonyaResponse.error || 'Failed to post to mwonya');
+        return; 
       }
+      const pesapalResponse = await handlePaymentRequest(paymentRequestData);
+      if (!pesapalResponse.success) {
+        setError(pesapalResponse.error || 'Failed to post to pesapal');
+        return; 
+      } 
+      setRedirectUrl(pesapalResponse.redirect_url || null);
     } catch (error) {
       console.error('Payment submission error:', error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');

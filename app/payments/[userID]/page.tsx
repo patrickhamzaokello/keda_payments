@@ -93,18 +93,18 @@ export default function UserPaymentsPage({
     setError(null);
 
     try {
-      const response = await postMwonyaOrder(paymentMwonyaData)
-      if (response.success) {
-        // Call the server action
-        const response = await handlePaymentRequest(paymentRequestData);
-        if (response.success) {
-          setRedirectUrl(response.redirect_url || null);
-        } else {
-          setError(response.error || 'An unexpected error occurred');
-        }
-      } else {
-        setError(response.error || 'An unexpected error occurred');
+      const mwonyaResponse = await postMwonyaOrder(paymentMwonyaData)
+      if (!mwonyaResponse.success) {
+        setError(mwonyaResponse.error || 'Failed to post to mwonya');
+        return; 
       }
+      const pesapalResponse = await handlePaymentRequest(paymentRequestData);
+      if (!pesapalResponse.success) {
+        setError(pesapalResponse.error || 'Failed to post to pesapal');
+        return; 
+      } 
+      setRedirectUrl(pesapalResponse.redirect_url || null);
+
     } catch (error) {
       console.error('Payment submission error:', error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
