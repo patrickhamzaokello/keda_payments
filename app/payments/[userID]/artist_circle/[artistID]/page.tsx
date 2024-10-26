@@ -83,8 +83,8 @@ export default function UserPaymentsPage({
     userId: userID,
     amount: 2500,
     currency: "UGX",
-    subscriptionType: artistID,
-    subscriptionTypeId: "1day",
+    subscriptionType: "artist_circle",
+    subscriptionTypeId: artistID,
     paymentCreatedDate: new Date().toISOString(),
     planDuration: 1,
     planDescription: "artist circle"
