@@ -12,7 +12,7 @@ export default function CheckStatusPage() {
     const orderMerchantReference = searchParams.get('OrderMerchantReference');
 
     const [error, setError] = useState<string | null>(null);
-    const [orderStatus, setOrderStatus] = useState<string | null>(null);
+    const [orderStatus, setOrderStatus] = useState<number | null>(null);
     const [payment_account, setPayment_account] = useState<string | null>(null);
     const [payment_amount, setPayment_amount] = useState<string | null>(null);
     const [payment_method, setPayment_method] = useState<string | null>(null);
@@ -42,7 +42,7 @@ export default function CheckStatusPage() {
             }
 
             const statusResponse = response;
-            setOrderStatus(statusResponse.status?.toString() ?? null); // Assuming the response has a 'status' field
+            setOrderStatus(statusResponse.code ?? null); // Assuming the response has a 'status' field
             setPayment_account(statusResponse.account ?? null);
             setPayment_amount(statusResponse.totalAmount?.toString() ?? null);
             setPayment_method(statusResponse.method ?? null);
@@ -214,16 +214,18 @@ export default function CheckStatusPage() {
                             </div>
                         )}
 
+                        {/* 0 - INVALID,  1 - COMPLETED, 2 - FAILED, 3 - REVERSED */}
+
                         {/* Order Status */}
                         {!loading && !error && orderStatus && (
                             <>
                                 {/* Success State */}
-                                {orderStatus === '200' && (
+                                {orderStatus === 1 && (
                                     <Receipt status="success" />
                                 )}
 
                                 {/* Failed State */}
-                                {['400', '401', '402', '403', '404', '500'].includes(orderStatus) && (
+                                {orderStatus === 2 && (
                                     <div className="space-y-4">
                                         <Receipt status="failed" />
                                         <Button
@@ -236,8 +238,22 @@ export default function CheckStatusPage() {
                                     </div>
                                 )}
 
-                                {/* Pending State */}
-                                {['100', '102', 'processing'].includes(orderStatus) && (
+                                {/* Reversed State */}
+                                {orderStatus === 3 && (
+                                    <div className="space-y-4">
+                                        <Receipt status="pending" />
+                                        <Button
+                                            className="w-full mt-4"
+                                            onClick={onRetry}
+                                            variant="secondary"
+                                        >
+                                            Check Again
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Invalid State */}
+                                {orderStatus === 0 && (
                                     <div className="space-y-4">
                                         <Receipt status="pending" />
                                         <Button
