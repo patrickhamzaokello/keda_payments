@@ -53,7 +53,7 @@ export default function UserPaymentsPage({
   const created_order_id = generateOrderId();
 
   const paymentRequestData: PaymentOrderRequest = {
-    id: generateOrderId(),
+    id: created_order_id,
     currency: "UGX",
     amount: 500.00,
     cancellation_url: "",
