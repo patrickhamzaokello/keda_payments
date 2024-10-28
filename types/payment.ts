@@ -63,7 +63,7 @@ export interface Repository {
 }
 
   export interface MwonyaPaymentDetails {
-    orderTrackingId: string;
+    merchant_reference: string;
     userId: string;
     amount: number;
     currency: string;

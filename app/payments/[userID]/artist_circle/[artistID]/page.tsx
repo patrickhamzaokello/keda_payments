@@ -79,7 +79,7 @@ export default function UserPaymentsPage({
   };
 
   const paymentMwonyaData: MwonyaPaymentDetails = {
-    orderTrackingId: created_order_id,
+    merchant_reference: created_order_id,
     userId: userID,
     amount: 2500,
     currency: "UGX",
