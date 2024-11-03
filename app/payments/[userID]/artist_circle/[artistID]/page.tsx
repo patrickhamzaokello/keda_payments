@@ -56,10 +56,8 @@ export default function UserPaymentsPage({
     id: created_order_id,
     currency: "UGX",
     amount: 500.00,
-    cancellation_url: "",
     description: "Payment description goes here",
     callback_url: "https://payments.mwonya.com/confirm_payment",
-    redirect_mode: "",  // Optional field that could be filled based on your requirements
     notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
     branch: "Store Name - HQ",
     billing_address: {
@@ -67,14 +65,8 @@ export default function UserPaymentsPage({
       phone_number: "0723xxxxxx",
       country_code: "KE",
       first_name: "John",
-      middle_name: "",  // Optional
       last_name: "Doe",
       line_1: "Pesapal Limited",
-      line_2: "",  // Optional
-      city: "",    // Optional
-      state: "",   // Optional
-      postal_code: "",  // Optional
-      zip_code: ""      // Optional
     }
   };
 

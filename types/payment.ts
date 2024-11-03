@@ -80,8 +80,6 @@ export interface Repository {
     amount: number;
     description: string;
     callback_url: string;
-    redirect_mode: string;
-    cancellation_url: string;
     notification_id: string;
     branch: string;
     billing_address: {
@@ -89,16 +87,12 @@ export interface Repository {
       phone_number: string;
       country_code: string;
       first_name: string;
-      middle_name?: string;
       last_name: string;
       line_1: string;
-      line_2?: string;
-      city?: string;
-      state?: string;
-      postal_code?: string;
-      zip_code?: string;
     };
   };
+
+
 
 
   export type UserDataResponse = {

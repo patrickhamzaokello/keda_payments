@@ -1,18 +1,18 @@
-"use client"
+"use client";
 import { useState, useEffect } from 'react';
-import { PaymentOrderRequest, MwonyaPaymentDetails, UserDataResponse, UserDetails } from "@/types/payment";
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { PaymentOrderRequest, MwonyaPaymentDetails, UserDetails } from "@/types/payment";
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { fetchUserDetails, handlePaymentRequest, postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
 import Image from 'next/image';
 
-interface ProductDetails {
+interface SubscriptionPlan {
+  id: string;
   name: string;
   price: number;
-  currency: string;
-  description: string;
+  duration: number;
 }
 
 export default function UserPaymentsPage({
@@ -25,92 +25,80 @@ export default function UserPaymentsPage({
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  const productDetails: ProductDetails = {
-    name: "Premium Subscription",
-    price: 500.00,
-    currency: "UGX",
-    description: "1 Month Premium Access to All Features"
-  };
+  const subscriptionPlans: SubscriptionPlan[] = [
+    { id: "daily", name: "Daily Pass", price: 500, duration: 1 },
+    { id: "weekly", name: "Weekly Pass", price: 2500, duration: 7 },
+    { id: "monthly", name: "Monthly Pass", price: 8000, duration: 30 }
+  ];
 
-  const formattedPrice = new Intl.NumberFormat('en-UG', {
-    style: 'currency',
-    currency: productDetails.currency
-  }).format(productDetails.price);
+  const sharedFeatures = [
+    "Full content access",
+    "HD streaming quality",
+    "Multiple device support",
+    "Offline downloads"
+  ];
 
   const generateOrderId = (): string => {
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[-:.T]/g, '')
-      .slice(0, 15);
-    const randomNum = Math.floor(100000 + Math.random() * 900000);
-    return `ORD${timestamp}${randomNum}`;
+    return `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
   };
 
-  const created_order_id = generateOrderId();
-
-  
-
-  const paymentMwonyaData: MwonyaPaymentDetails = {
-    merchant_reference: created_order_id,
-    userId: userID,
-    amount: 2500,
-    currency: "UGX",
-    subscriptionType: "1 day pass",
-    subscriptionTypeId: "1day",
-    paymentCreatedDate: new Date().toISOString(),
-    planDuration: 1,
-    planDescription: "payment for subscription"
-  };
-
-
-
-
-  const handlePaymentSubmission = async () => {
+  const handlePaymentSubmission = async (plan: SubscriptionPlan) => {
     setProcessingPayment(true);
     setError(null);
+    setSelectedPlan(plan.id);
+    const orderId = generateOrderId();
 
     try {
-      const mwonyaResponse = await postMwonyaOrder(paymentMwonyaData)
+      const mwonyaPaymentData: MwonyaPaymentDetails = {
+        merchant_reference: orderId,
+        userId: userID,
+        amount: plan.price,
+        currency: "UGX",
+        subscriptionType: `${plan.duration} day pass`,
+        subscriptionTypeId: plan.id,
+        paymentCreatedDate: new Date().toISOString(),
+        planDuration: plan.duration,
+        planDescription: `${plan.name} subscription`
+      };
+
+      const paymentRequestData: PaymentOrderRequest = {
+        id: orderId,
+        currency: "UGX",
+        amount: plan.price,
+        description: `${plan.name} Subscription`,
+        callback_url: "https://payments.mwonya.com/confirm_payment",
+        notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
+        branch: "Mwonya Payments- HQ",
+        billing_address: {
+          email_address: userDetails?.email ?? "",
+          phone_number: "0723xxxxxx",
+          country_code: "UG",
+          first_name: userDetails?.firstName ?? "",
+          last_name: userDetails?.lastName ?? "",
+          line_1: "Kampala, uganda",
+        }
+      };
+
+      const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData);
       if (!mwonyaResponse.success) {
-        setError(mwonyaResponse.error || 'Failed to post to mwonya');
-        return; 
+        throw new Error(mwonyaResponse.error || 'Mwonya payment failed');
       }
+
       const pesapalResponse = await handlePaymentRequest(paymentRequestData);
       if (!pesapalResponse.success) {
-        setError(pesapalResponse.error || 'Failed to post to pesapal');
-        return; 
-      } 
-      setRedirectUrl(pesapalResponse.redirect_url || null);
+        throw new Error(pesapalResponse.error || 'Pesapal payment failed');
+      }
 
+      setRedirectUrl(pesapalResponse.redirect_url || null);
     } catch (error) {
-      console.error('Payment submission error:', error);
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      console.error('Payment error:', error);
+      setError(error instanceof Error ? error.message : 'Payment processing failed');
     } finally {
       setProcessingPayment(false);
     }
   };
-
-  useEffect(() => {
-    if (redirectUrl) {
-      const timer = setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [redirectUrl]);
-
-  // Validation
-  if (!userID?.match(/^mw[a-zA-Z0-9]+$/)) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Invalid user ID format. Please check the URL and try again.
-        </AlertDescription>
-      </Alert>
-    );
-  }
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -122,106 +110,111 @@ export default function UserPaymentsPage({
           setError('Failed to retrieve user details');
         }
       } catch (error) {
-        console.error('Error fetching user details:', error);
-        setError('An error occurred while fetching user details');
+        setError('Error fetching user details');
       }
     };
 
     fetchDetails();
   }, [userID]);
 
-  const paymentRequestData: PaymentOrderRequest = {
-    id: created_order_id,
-    currency: "UGX",
-    amount: 500.00,
-    cancellation_url: "",
-    description: "Payment description goes here",
-    callback_url: "https://payments.mwonya.com/confirm_payment",
-    redirect_mode: "",  // Optional field that could be filled based on your requirements
-    notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
-    branch: "Mwonya Payments- HQ",
-    billing_address: {
-      email_address:  userDetails?.email?? "",
-      phone_number: "0723xxxxxx",
-      country_code: "UG",
-      first_name: userDetails?.lastName?? "",
-      last_name: userDetails?.lastName?? "",
-      line_1: "Kampala, uganda",
+  useEffect(() => {
+    if (redirectUrl) {
+      const timer = setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [redirectUrl]);
+
+  if (!userID?.match(/^mw[a-zA-Z0-9]+$/)) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>Invalid user ID format</AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
-    <div className="container mx-auto max-w-md py-8">
-    {/* Display user details if available */}
-    {userDetails && (
-        <div className="mb-4 p-4 bg-gray-100 rounded-lg">
-          <h2 className="text-lg font-semibold">User Details</h2>
-          <p><strong>Username:</strong> {userDetails.firstName}</p>
-          <p><strong>Email:</strong> {userDetails.email}</p>
-          <Image width={15} height={15} src={userDetails.profilePic} alt="Profile" className="w-16 h-16 rounded-full mt-2" />
+    <div className="max-w-4xl mx-auto p-4 space-y-6">
+      {/* User Profile */}
+      {userDetails && (
+        <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+          <Image
+            width={40}
+            height={40}
+            src={userDetails.profilePic}
+            alt="Profile"
+            className="rounded-full"
+          />
+          <div>
+            <h2 className="font-semibold">{userDetails.firstName}</h2>
+            <p className="text-sm text-gray-600">{userDetails.email}</p>
+          </div>
         </div>
       )}
-      <Card>
-        <CardHeader>
-          <h1 className="text-2xl font-bold text-center">
-            Complete Your Purchase
-          </h1>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Product Details */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h2 className="font-semibold text-lg mb-2">
-                {productDetails.name}
-              </h2>
-              <p className="text-gray-600 text-sm mb-3">
-                {productDetails.description}
-              </p>
-              <div className="text-xl font-bold">
-                {formattedPrice}
+
+      {/* Alerts */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
+      {redirectUrl && (
+        <Alert className="bg-green-50 border-green-200">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription>Redirecting to payment...</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Subscription Cards */}
+      <div className="grid md:grid-cols-3 gap-4">
+        {subscriptionPlans.map((plan) => (
+          <Card key={plan.id} className="p-4 relative">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-semibold">{plan.name}</h3>
+              <div className="text-2xl font-bold mt-2">
+                {new Intl.NumberFormat('en-UG', {
+                  style: 'currency',
+                  currency: 'UGX'
+                }).format(plan.price)}
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                {plan.duration} day{plan.duration > 1 ? 's' : ''}
               </div>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Success Message */}
-            {redirectUrl && (
-              <Alert className="bg-green-50 border-green-200">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription>
-                  Payment initiated! Redirecting to payment page...
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Payment Button */}
             <Button
-              className="w-full"
-              onClick={handlePaymentSubmission}
-              disabled={processingPayment || !!redirectUrl}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              onClick={() => handlePaymentSubmission(plan)}
+              disabled={processingPayment}
             >
-              {processingPayment ? (
-                <>
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+              {processingPayment && selectedPlan === plan.id ? (
+                <div className="flex items-center gap-2">
+                  <Loader className="h-4 w-4 animate-spin" />
                   Processing...
-                </>
-              ) : redirectUrl ? (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Redirecting...
-                </>
+                </div>
               ) : (
-                'Proceed to Payment'
+                'Subscribe'
               )}
             </Button>
-          </div>
-        </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Shared Features */}
+      <Card className="p-4">
+        <h3 className="font-semibold mb-3">All plans include:</h3>
+        <ul className="grid grid-cols-2 gap-2">
+          {sharedFeatures.map((feature, index) => (
+            <li key={index} className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span className="text-sm">{feature}</span>
+            </li>
+          ))}
+        </ul>
       </Card>
     </div>
   );
