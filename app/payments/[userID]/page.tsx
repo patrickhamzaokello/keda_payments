@@ -187,7 +187,7 @@ export default function UserPaymentsPage({
             </div>
 
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-zinc-950 hover:bg-violet-950"
               onClick={() => handlePaymentSubmission(plan)}
               disabled={processingPayment}
             >
