@@ -2,6 +2,7 @@
 import { paymentService } from '@/services/paymentService';
 import {mwonyaService} from '@/services/mwonyaDataService';
 import { MwonyaPaymentDetails, PaymentOrderRequest } from '@/types/payment';
+import exp from 'constants';
 
 
 export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
@@ -31,6 +32,15 @@ export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
   } catch (error) {
     console.error('Payment API error:', error);
     return { success: false, error: 'Payment processing failed', status: 500 };
+  }
+}
+
+export async function fetchUserDetails(userID:string) {
+  try {
+    const response = await fetch(`https://test.mwonya.com/Requests/endpoints/getUserDetails.php?userID=${userID}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
   }
 }
 

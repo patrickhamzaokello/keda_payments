@@ -100,6 +100,25 @@ export interface Repository {
     };
   };
 
+
+  export type UserDataResponse = {
+    error: boolean;
+    message: string;
+    userDetails: UserDetails[];
+};
+
+export type UserDetails = {
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    profilePic: string;
+    signUpDate: string;
+    verified: number;
+    mwRole: string;
+};
+
   export interface PaymentIPNRegister {
     url: string;
     ipnNotificationType: string;
