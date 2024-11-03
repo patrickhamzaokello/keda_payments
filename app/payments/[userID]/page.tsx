@@ -40,6 +40,7 @@ export default function UserPaymentsPage({
     "Offline downloads"
   ];
 
+  // Rest of the functions remain the same
   const generateOrderId = (): string => {
     return `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
   };
@@ -136,10 +137,10 @@ export default function UserPaymentsPage({
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
+    <div className="max-w-4xl mx-auto p-4 space-y-6 bg-gray-900 min-h-screen text-gray-100">
       {/* User Profile */}
       {userDetails && (
-        <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center gap-4 p-4 bg-gray-800 rounded-lg">
           <Image
             width={40}
             height={40}
@@ -148,8 +149,8 @@ export default function UserPaymentsPage({
             className="rounded-full"
           />
           <div>
-            <h2 className="font-semibold">{userDetails.firstName}</h2>
-            <p className="text-sm text-gray-600">{userDetails.email}</p>
+            <h2 className="font-semibold text-white">{userDetails.firstName}</h2>
+            <p className="text-sm text-gray-300">{userDetails.email}</p>
           </div>
         </div>
       )}
@@ -163,31 +164,31 @@ export default function UserPaymentsPage({
       )}
       
       {redirectUrl && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription>Redirecting to payment...</AlertDescription>
+        <Alert className="bg-green-900 border-green-700">
+          <CheckCircle className="h-4 w-4 text-green-400" />
+          <AlertDescription className="text-green-100">Redirecting to payment...</AlertDescription>
         </Alert>
       )}
 
       {/* Subscription Cards */}
       <div className="grid md:grid-cols-3 gap-4">
         {subscriptionPlans.map((plan) => (
-          <Card key={plan.id} className="p-4 relative">
+          <Card key={plan.id} className="p-4 relative bg-gray-800 border-gray-700">
             <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold">{plan.name}</h3>
-              <div className="text-2xl font-bold mt-2">
+              <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
+              <div className="text-2xl font-bold mt-2 text-violet-400">
                 {new Intl.NumberFormat('en-UG', {
                   style: 'currency',
                   currency: 'UGX'
                 }).format(plan.price)}
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-gray-400 mt-1">
                 {plan.duration} day{plan.duration > 1 ? 's' : ''}
               </div>
             </div>
 
             <Button
-              className="w-full bg-zinc-950 hover:bg-violet-950"
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white"
               onClick={() => handlePaymentSubmission(plan)}
               disabled={processingPayment}
             >
@@ -205,13 +206,13 @@ export default function UserPaymentsPage({
       </div>
 
       {/* Shared Features */}
-      <Card className="p-4">
-        <h3 className="font-semibold mb-3">All plans include:</h3>
+      <Card className="p-4 bg-gray-800 border-gray-700">
+        <h3 className="font-semibold mb-3 text-white">All plans include:</h3>
         <ul className="grid grid-cols-2 gap-2">
           {sharedFeatures.map((feature, index) => (
             <li key={index} className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <span className="text-sm">{feature}</span>
+              <CheckCircle className="h-4 w-4 text-violet-400" />
+              <span className="text-sm text-gray-300">{feature}</span>
             </li>
           ))}
         </ul>
