@@ -14,7 +14,7 @@ export default function MonochromaticLayout({
       <body
         className={cn(
           inter.className,
-          "min-h-screen bg-zinc-950 text-gray-200 antialiased selection:bg-gray-700 selection:text-white"
+          "min-h-screen bg-zinc-950 text-gray-200 antialiased selection:bg-zinc-950 selection:text-white"
         )}
       >
         <div className="relative flex min-h-screen flex-col">

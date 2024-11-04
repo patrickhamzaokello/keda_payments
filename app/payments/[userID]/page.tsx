@@ -181,9 +181,9 @@ export default function UserPaymentsPage({
           )}
           
           {redirectUrl && (
-            <Alert className="bg-zinc-900 border-zinc-800">
-              <CheckCircle className="h-4 w-4 text-zinc-400" />
-              <AlertDescription className="text-zinc-400">Redirecting to payment...</AlertDescription>
+            <Alert className="bg-violet-900 border-violet-800">
+              <CheckCircle className="h-4 w-4 text-violet-400" />
+              <AlertDescription className="text-violet-400">Redirecting to payment...</AlertDescription>
             </Alert>
           )}
         </div>
