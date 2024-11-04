@@ -162,7 +162,7 @@ export default function UserPaymentsPage({
   }
 
   return (
-    <div className="container mx-auto max-w-md py-8">
+    <div className="container mx-auto max-w-md py-8 bg-zinc-950">
       <Card>
         <CardHeader>
           <h1 className="text-2xl font-bold text-center">
@@ -172,7 +172,7 @@ export default function UserPaymentsPage({
         <CardContent>
           <div className="space-y-4">
             {/* Product Details */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-zinc-950 p-4 rounded-lg">
               <h2 className="font-semibold text-lg mb-2">
                 {productDetails.name}
               </h2>
