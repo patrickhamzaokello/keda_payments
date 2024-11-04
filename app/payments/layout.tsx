@@ -14,12 +14,12 @@ export default function MonochromaticLayout({
       <body
         className={cn(
           inter.className,
-          "min-h-screen bg-black text-gray-200 antialiased selection:bg-gray-700 selection:text-white"
+          "min-h-screen bg-zinc-950 text-gray-200 antialiased selection:bg-gray-700 selection:text-white"
         )}
       >
         <div className="relative flex min-h-screen flex-col">
           {/* Header */}
-          <header className="sticky top-0 z-50 w-full border-b border-gray-800/40 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/75">
+          <header className="sticky top-0 z-50 w-full border-b border-gray-800/40 bg-zinc-950 backdrop-blur supports-[backdrop-filter]:bg-zinc-950 ">
             <div className="container flex h-16 items-center justify-between">
               <div className="flex items-center space-x-4">
                 <a 
@@ -64,7 +64,7 @@ export default function MonochromaticLayout({
           </main>
 
           {/* Footer */}
-          <footer className="border-t border-gray-800/40 bg-black mt-auto">
+          <footer className="border-t border-gray-800/40 bg-zinc-950  mt-auto">
             <div className="container py-8">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 {/* Company Info */}

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { PaymentOrderRequest, MwonyaPaymentDetails, UserDetails } from "@/types/payment";
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader, ChevronRight } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { fetchUserDetails, handlePaymentRequest, postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
 import Image from 'next/image';
@@ -34,13 +34,17 @@ export default function UserPaymentsPage({
   ];
 
   const sharedFeatures = [
+    "Exclusive Tracks",
     "Full content access",
-    "HD streaming quality",
+    "High quality audio",
+    "Offline downloads",
+    "Free Artists Circle's Membership",
+    "No Ads",
     "Multiple device support",
-    "Offline downloads"
+
   ];
 
-  // Rest of the functions remain the same
+  // Existing functions remain the same
   const generateOrderId = (): string => {
     return `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
   };
@@ -137,86 +141,122 @@ export default function UserPaymentsPage({
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6 bg-gray-900 min-h-screen text-gray-100">
-      {/* User Profile */}
-      {userDetails && (
-        <div className="flex items-center gap-4 p-4 bg-gray-800 rounded-lg">
-          <Image
-            width={40}
-            height={40}
-            src={userDetails.profilePic}
-            alt="Profile"
-            className="rounded-full"
-          />
-          <div>
-            <h2 className="font-semibold text-white">{userDetails.firstName}</h2>
-            <p className="text-sm text-gray-300">{userDetails.email}</p>
-          </div>
+    <div className="min-h-screen bg-zinc-950">
+      <div className="max-w-5xl mx-auto p-6 space-y-8">
+        {/* Header Section */}
+        <div className="text-center space-y-4 mb-12">
+          <h1 className="text-3xl font-bold text-zinc-100">Choose Your Plan</h1>
+          <p className="text-zinc-400 max-w-2xl mx-auto">
+            Select the perfect subscription that suits your needs
+          </p>
         </div>
-      )}
 
-      {/* Alerts */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      
-      {redirectUrl && (
-        <Alert className="bg-green-900 border-green-700">
-          <CheckCircle className="h-4 w-4 text-green-400" />
-          <AlertDescription className="text-green-100">Redirecting to payment...</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Subscription Cards */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {subscriptionPlans.map((plan) => (
-          <Card key={plan.id} className="p-4 relative bg-gray-800 border-gray-700">
-            <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
-              <div className="text-2xl font-bold mt-2 text-violet-400">
-                {new Intl.NumberFormat('en-UG', {
-                  style: 'currency',
-                  currency: 'UGX'
-                }).format(plan.price)}
+        {/* User Profile Card */}
+        {userDetails && (
+          <Card className="p-4 bg-zinc-900 border-zinc-800">
+            <div className="flex items-center gap-4">
+              <div className="relative w-12 h-12 ring-2 ring-zinc-700 rounded-full">
+                <Image
+                  fill
+                  src={userDetails.profilePic}
+                  alt="Profile"
+                  className="rounded-full object-cover"
+                />
               </div>
-              <div className="text-sm text-gray-400 mt-1">
-                {plan.duration} day{plan.duration > 1 ? 's' : ''}
+              <div>
+                <h2 className="font-semibold text-zinc-100">{userDetails.firstName}</h2>
+                <p className="text-sm text-zinc-400">{userDetails.email}</p>
               </div>
             </div>
-
-            <Button
-              className="w-full bg-violet-600 hover:bg-violet-700 text-white"
-              onClick={() => handlePaymentSubmission(plan)}
-              disabled={processingPayment}
-            >
-              {processingPayment && selectedPlan === plan.id ? (
-                <div className="flex items-center gap-2">
-                  <Loader className="h-4 w-4 animate-spin" />
-                  Processing...
-                </div>
-              ) : (
-                'Subscribe'
-              )}
-            </Button>
           </Card>
-        ))}
-      </div>
+        )}
 
-      {/* Shared Features */}
-      <Card className="p-4 bg-gray-800 border-gray-700">
-        <h3 className="font-semibold mb-3 text-white">All plans include:</h3>
-        <ul className="grid grid-cols-2 gap-2">
-          {sharedFeatures.map((feature, index) => (
-            <li key={index} className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-violet-400" />
-              <span className="text-sm text-gray-300">{feature}</span>
-            </li>
+        {/* Alerts */}
+        <div className="space-y-4">
+          {error && (
+            <Alert variant="destructive" className="bg-red-950/50 border-red-900">
+              <AlertCircle className="h-4 w-4 text-red-400" />
+              <AlertDescription className="text-red-400">{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          {redirectUrl && (
+            <Alert className="bg-zinc-900 border-zinc-800">
+              <CheckCircle className="h-4 w-4 text-zinc-400" />
+              <AlertDescription className="text-zinc-400">Redirecting to payment...</AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        {/* Subscription Plans Grid */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {subscriptionPlans.map((plan) => (
+            <Card 
+              key={plan.id} 
+              className={`relative overflow-hidden transition-all duration-300
+                ${selectedPlan === plan.id ? 
+                  'bg-zinc-800 border-2 border-zinc-600' : 
+                  'bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80'}
+              `}
+            >
+              <div className="p-6 space-y-6">
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-zinc-100">{plan.name}</h3>
+                  <div className="mt-4 space-y-1">
+                    <span className="text-3xl font-bold text-zinc-100">
+                      {new Intl.NumberFormat('en-UG', {
+                        style: 'currency',
+                        currency: 'UGX'
+                      }).format(plan.price)}
+                    </span>
+                    <p className="text-sm text-zinc-400">
+                      {plan.duration} day{plan.duration > 1 ? 's' : ''} access
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  className={`w-full transition-colors duration-300
+                    ${processingPayment && selectedPlan === plan.id ?
+                      'bg-zinc-700' :
+                      'bg-zinc-100 text-zinc-900 hover:bg-zinc-200'
+                    }`}
+                  onClick={() => handlePaymentSubmission(plan)}
+                  disabled={processingPayment}
+                >
+                  {processingPayment && selectedPlan === plan.id ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader className="h-4 w-4 animate-spin" />
+                      <span>Processing...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>Subscribe</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </div>
+                  )}
+                </Button>
+              </div>
+            </Card>
           ))}
-        </ul>
-      </Card>
+        </div>
+
+        {/* Features Section */}
+        <Card className="mt-12 p-8 bg-zinc-900 border-zinc-800">
+          <h3 className="text-xl font-semibold text-zinc-100 mb-6">All plans include:</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            {sharedFeatures.map((feature, index) => (
+              <div 
+                key={index} 
+                className="flex items-center gap-3 p-4 rounded-lg bg-zinc-800/50"
+              >
+                <CheckCircle className="h-5 w-5 text-zinc-400" />
+                <span className="text-zinc-300">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
