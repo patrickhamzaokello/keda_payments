@@ -1,12 +1,13 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { PaymentOrderRequest,MwonyaPaymentDetails } from "@/types/payment";
+import { PaymentOrderRequest,MwonyaPaymentDetails, ArtistCircleDetails } from "@/types/payment";
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Decimal from 'decimal.js';
-import { handlePaymentRequest,postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
+import { fetchArtistDetails, handlePaymentRequest,postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
+import Image from 'next/image';
 
 interface ProductDetails {
   name: string;
@@ -27,6 +28,7 @@ export default function UserPaymentsPage({
 
   const [error, setError] = useState<string | null>(null);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+  const [artistDetails, setArtistCircleDetails] = useState<ArtistCircleDetails | null>(null);
   const [processingPayment, setProcessingPayment] = useState(false);
 
   const productDetails: ProductDetails = {
@@ -109,6 +111,23 @@ export default function UserPaymentsPage({
   };
 
   useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const data = await fetchArtistDetails(artistID);
+        if (!data?.error) {
+          setArtistCircleDetails(data?.artistDetails);
+        } else {
+          setError('Failed to retrieve user details');
+        }
+      } catch (error) {
+        setError('Error fetching user details');
+      }
+    };
+
+    fetchDetails();
+  }, [artistID]);
+
+  useEffect(() => {
     if (redirectUrl) {
       const timer = setTimeout(() => {
         window.location.href = redirectUrl;
@@ -163,6 +182,31 @@ export default function UserPaymentsPage({
 
   return (
     <div className="container mx-auto max-w-md py-8 bg-zinc-950">
+      <div>
+        {/* User Profile Card */}
+        {artistDetails && (
+          <Card className="p-4 bg-zinc-900 border-zinc-800">
+            <div className="flex items-center gap-4">
+              <div className="relative w-12 h-12 ring-2 ring-zinc-700 rounded-full">
+                <Image
+                  fill
+                  src={artistDetails.profilephoto}
+                  alt="Profile"
+                  className="rounded-full object-cover"
+                />
+              </div>
+              <div>
+                <h2 className="font-semibold text-zinc-100">{artistDetails.name}</h2>
+                <p className="text-sm text-zinc-400">{artistDetails.genre}</p>
+                <p className="text-sm text-zinc-400">Verified: {artistDetails.verified}</p>
+                <p className="text-sm text-zinc-400">Cost (UGX): {artistDetails.circle_cost}</p>
+                <p className="text-sm text-zinc-400">Duration: {artistDetails.circle_duration}</p>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+      
       <Card>
         <CardHeader>
           <h1 className="text-2xl font-bold text-center">

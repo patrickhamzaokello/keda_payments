@@ -21,6 +21,12 @@ const nextConfig = {
         port: '',
         pathname: '/a/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'assets.mwonya.com',
+        port: '',
+        pathname: '/images/**',
+      },
     ],
   },
 };

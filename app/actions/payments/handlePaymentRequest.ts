@@ -1,7 +1,7 @@
 "use server"
 import { paymentService } from '@/services/paymentService';
-import {mwonyaService} from '@/services/mwonyaDataService';
-import { MwonyaPaymentDetails, PaymentOrderRequest } from '@/types/payment';
+import { mwonyaService } from '@/services/mwonyaDataService';
+import { ArtistDetailsResponse, MwonyaPaymentDetails, PaymentOrderRequest } from '@/types/payment';
 import exp from 'constants';
 
 
@@ -35,7 +35,7 @@ export async function handlePaymentRequest(orderDetails: PaymentOrderRequest) {
   }
 }
 
-export async function fetchUserDetails(userID:string) {
+export async function fetchUserDetails(userID: string) {
   try {
     const response = await fetch(`https://test.mwonya.com/Requests/endpoints/getUserDetails.php?userID=${userID}`);
     const data = await response.json();
@@ -44,17 +44,27 @@ export async function fetchUserDetails(userID:string) {
   }
 }
 
+export async function fetchArtistDetails(artistID: string): Promise<ArtistDetailsResponse> {
+  try {
+    const response = await fetch(`https://test.mwonya.com/Requests/endpoints/getArtistCircleDetails.php?artistID=${artistID}`);
+    const data: ArtistDetailsResponse = await response.json();
+    return data;
+  } catch (error) {
+    return { error: true, message: 'error', artistDetails: null };
+  }
+}
+
 
 export async function postMwonyaOrder(paymentDetails: MwonyaPaymentDetails) {
 
   try {
-  
-    console.log({paymentDetails})
+
+    console.log({ paymentDetails })
     // Submit order to mwonya
     const response = await mwonyaService.postPaymentDetailsToMwonya(paymentDetails);
 
     return {
-      success: !response.error,      
+      success: !response.error,
       message: response.message,
     };
   } catch (error) {
