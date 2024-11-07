@@ -26,6 +26,11 @@ const nextConfig = {
         hostname: 'assets.mwonya.com',
         port: '',
         pathname: '/images/**',
+      }, {
+        protocol: 'https',
+        hostname: 'www.promptengineering.org',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

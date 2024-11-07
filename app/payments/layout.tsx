@@ -17,7 +17,7 @@ export default function MonochromaticLayout({
           "min-h-screen bg-zinc-950 text-gray-200 antialiased selection:bg-zinc-950 selection:text-white"
         )}
       >
-        <div className="relative flex min-h-screen flex-col">
+        <div className="relative flex min-h-screen flex-col bg-zinc-950">
           {/* Header */}
           <header className="sticky top-0 z-50 w-full border-b border-gray-800/40 bg-zinc-950 backdrop-blur supports-[backdrop-filter]:bg-zinc-950 ">
             <div className="container flex h-16 items-center justify-between">
@@ -55,7 +55,7 @@ export default function MonochromaticLayout({
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 mt-8">
+          <main className="flex-1 mt-8 ">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="relative py-6">
                 {children}

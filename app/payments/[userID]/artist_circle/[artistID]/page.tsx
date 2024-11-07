@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { PaymentOrderRequest,MwonyaPaymentDetails, ArtistCircleDetails } from "@/types/payment";
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader, Users, Calendar, Star, Trophy } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Decimal from 'decimal.js';
 import { fetchArtistDetails, handlePaymentRequest,postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
@@ -181,94 +181,167 @@ export default function UserPaymentsPage({
   }
 
   return (
-    <div className="container mx-auto max-w-md py-8 bg-zinc-950">
-      <div>
-        {/* User Profile Card */}
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 py-12">
+      <div className="max-w-xl mx-auto px-4">
+        {/* Artist Profile */}
         {artistDetails && (
-          <Card className="p-4 bg-zinc-900 border-zinc-800">
-            <div className="flex items-center gap-4">
-              <div className="relative w-12 h-12 ring-2 ring-zinc-700 rounded-full">
-                <Image
-                  fill
-                  src={artistDetails.profilephoto}
-                  alt="Profile"
-                  className="rounded-full object-cover"
-                />
-              </div>
-              <div>
-                <h2 className="font-semibold text-zinc-100">{artistDetails.name}</h2>
-                <p className="text-sm text-zinc-400">{artistDetails.genre}</p>
-                <p className="text-sm text-zinc-400">Verified: {artistDetails.verified}</p>
-                <p className="text-sm text-zinc-400">Cost (UGX): {artistDetails.circle_cost}</p>
-                <p className="text-sm text-zinc-400">Duration: {artistDetails.circle_duration}</p>
+          <div className="mb-8">
+            <div className="relative bg-zinc-900/50 backdrop-blur-lg rounded-2xl p-6 border border-zinc-800/50 overflow-hidden">
+              {/* Decorative background elements */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
+              
+              <div className="relative">
+                <div className="flex items-start gap-6">
+                  <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-zinc-800 ring-2 ring-zinc-700/50">
+                    <Image
+                      fill
+                      src={artistDetails.profilephoto}
+                      alt="Profile"
+                      className="object-cover"
+                    />
+                  </div>
+                  
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-semibold text-zinc-100">
+                        {artistDetails.name}
+                      </h2>
+                      {artistDetails.verified && (
+                        <span className="flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">
+                          <CheckCircle className="w-3 h-3" />
+                          Verified Artist
+                        </span>
+                      )}
+                    </div>
+                    
+                    <p className="text-sm text-zinc-400">{artistDetails.genre}</p>
+                    
+                    {/* Engagement metrics */}
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-1 text-zinc-300">
+                        <Users className="w-4 h-4 text-blue-400" />
+                        <span>2k members</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-zinc-300">
+                        <Star className="w-4 h-4 text-yellow-400" />
+                        <span>4.3 rating</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Value proposition cards */}
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                  <div className="bg-zinc-800/30 rounded-xl p-4 border border-zinc-700/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Trophy className="w-4 h-4 text-yellow-400" />
+                      <h3 className="font-medium text-zinc-200">Exclusive Access</h3>
+                    </div>
+                    <p className="text-sm text-zinc-400">Get direct interaction and personal feedback from {artistDetails.name}</p>
+                  </div>
+                  <div className="bg-zinc-800/30 rounded-xl p-4 border border-zinc-700/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="w-4 h-4 text-emerald-400" />
+                      <h3 className="font-medium text-zinc-200">{artistDetails.circle_duration} Days</h3>
+                    </div>
+                    <p className="text-sm text-zinc-400">Intensive learning and collaboration period</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </Card>
-        )}
-      </div>
-      
-      <Card>
-        <CardHeader>
-          <h1 className="text-2xl font-bold text-center">
-            Complete Your Purchase
-          </h1>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Product Details */}
-            <div className="bg-zinc-950 p-4 rounded-lg">
-              <h2 className="font-semibold text-lg mb-2">
-                {productDetails.name}
-              </h2>
-              <p className="text-gray-600 text-sm mb-3">
-                {productDetails.description}
-              </p>
-              <div className="text-xl font-bold">
-                {formattedPrice}
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Success Message */}
-            {redirectUrl && (
-              <Alert className="bg-green-50 border-green-200">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription>
-                  Payment initiated! Redirecting to payment page...
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Payment Button */}
-            <Button
-              className="w-full"
-              onClick={handlePaymentSubmission}
-              disabled={processingPayment || !!redirectUrl}
-            >
-              {processingPayment ? (
-                <>
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : redirectUrl ? (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Redirecting...
-                </>
-              ) : (
-                'Proceed to Payment'
-              )}
-            </Button>
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {/* Checkout Card */}
+        <Card className="bg-zinc-900/50 backdrop-blur-lg border-zinc-800/50">
+          <CardHeader>
+            <h1 className="text-xl font-medium text-zinc-100 text-center">
+              Join the Inner Circle
+            </h1>
+            <p className="text-sm text-zinc-400 text-center">Limited spots available</p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {/* Product Details */}
+              <div className="rounded-xl bg-zinc-800/30 p-4 border border-zinc-700/30">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h2 className="font-medium text-zinc-200">
+                      {productDetails.name}
+                    </h2>
+                    <p className="text-sm text-zinc-400 mt-1">
+                      {productDetails.description}
+                    </p>
+                  </div>
+                  <div className="text-xl font-semibold text-zinc-100">
+                    {formattedPrice}
+                  </div>
+                </div>
+                
+                {/* Added benefits list */}
+                <ul className="space-y-2 mt-4">
+                  <li className="flex items-center gap-2 text-sm text-zinc-300">
+                    <CheckCircle className="w-4 h-4 text-emerald-400" />
+                    Personalized mentorship sessions
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-zinc-300">
+                    <CheckCircle className="w-4 h-4 text-emerald-400" />
+                    Exclusive content and tutorials
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-zinc-300">
+                    <CheckCircle className="w-4 h-4 text-emerald-400" />
+                    Community collaboration opportunities
+                  </li>
+                </ul>
+              </div>
+
+              {/* Messages */}
+              {error && (
+                <Alert className="bg-red-500/10 border-red-500/20 text-red-400">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {redirectUrl && (
+                <Alert className="bg-emerald-500/10 border-emerald-500/20 text-emerald-400">
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Payment initiated! Redirecting to payment page...
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Payment Button */}
+              <div className="space-y-3">
+                <Button
+                  className="w-full bg-gradient-to-r from-violet-700	 to-violet-800 hover:from-violet-700 hover:violet-800 text-white font-medium py-6 shadow-lg shadow-violet-700/20 transition-all hover:shadow-xl hover:shadow-violet-700/30"
+                  onClick={handlePaymentSubmission}
+                  disabled={processingPayment || !!redirectUrl}
+                >
+                  {processingPayment ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : redirectUrl ? (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Redirecting...
+                    </>
+                  ) : (
+                    'Join Now'
+                  )}
+                </Button>
+                <p className="text-center text-xs text-zinc-500">
+                  Satisfaction guarantee • Instant access upon payment
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -141,7 +141,7 @@ export default function UserPaymentsPage({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
       <div className="max-w-5xl mx-auto p-6 space-y-8">
         {/* Header Section */}
         <div className="text-center space-y-4 mb-12">
