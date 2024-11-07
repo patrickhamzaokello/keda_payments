@@ -54,44 +54,44 @@ export default function UserPaymentsPage({
 
   const created_order_id = generateOrderId();
 
-  const paymentRequestData: PaymentOrderRequest = {
-    id: created_order_id,
-    currency: "UGX",
-    amount: 500.00,
-    description: "Payment description goes here",
-    callback_url: "https://payments.mwonya.com/confirm_payment",
-    notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
-    branch: "Store Name - HQ",
-    billing_address: {
-      email_address: "john.doe@example.com",
-      phone_number: "0723xxxxxx",
-      country_code: "KE",
-      first_name: "John",
-      last_name: "Doe",
-      line_1: "Pesapal Limited",
-    }
-  };
-
-  const paymentMwonyaData: MwonyaPaymentDetails = {
-    merchant_reference: created_order_id,
-    userId: userID,
-    amount: 2500,
-    currency: "UGX",
-    subscriptionType: "artist_circle",
-    subscriptionTypeId: artistID,
-    paymentCreatedDate: new Date().toISOString(),
-    planDuration: 1,
-    planDescription: "artist circle"
-  };
-
-
 
   const handlePaymentSubmission = async () => {
     setProcessingPayment(true);
     setError(null);
 
     try {
-      const mwonyaResponse = await postMwonyaOrder(paymentMwonyaData)
+
+      const mwonyaPaymentData: MwonyaPaymentDetails = {
+        merchant_reference: created_order_id,
+        userId: userID,
+        amount: parseFloat(amountString??""),
+        currency: "UGX",
+        subscriptionType: "artist_circle",
+        subscriptionTypeId: artistID,
+        paymentCreatedDate: new Date().toISOString(),
+        planDuration: artistDetails?.circle_duration?? 0,
+        planDescription: `${artistDetails?.name} artist circle subscription`
+      };
+
+      const paymentRequestData: PaymentOrderRequest = {
+        id: created_order_id,
+        currency: "UGX",
+        amount: parseFloat(amountString??""),
+        description: `${artistDetails?.name} artist circle subscription by ${userID} `,
+        callback_url: "https://payments.mwonya.com/confirm_payment",
+        notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
+        branch: "Mwonya Payments- HQ",
+        billing_address: {
+          email_address: "Email",
+          phone_number: "0723xxxxxx",
+          country_code: "UG",
+          first_name: "first name",
+          last_name: "last name",
+          line_1: "Kampala, uganda",
+        }
+      };
+
+      const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData)
       if (!mwonyaResponse.success) {
         setError(mwonyaResponse.error || 'Failed to post to mwonya');
         return; 
@@ -181,15 +181,15 @@ export default function UserPaymentsPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 py-12">
-      <div className="max-w-xl mx-auto px-4">
+    <div className="min-h-screen py-0">
+      <div className="max-w-xl mx-auto">
         
 
         {/* Checkout Card */}
         <Card className="bg-zinc-900/50 backdrop-blur-lg border-zinc-800/50">
           <CardHeader>
             <h1 className="text-xl font-medium text-zinc-100 text-center">
-              Join the Inner Circle
+              Join the Artist Circle
             </h1>
             <p className="text-sm text-zinc-400 text-center">Limited spots available</p>
           </CardHeader>

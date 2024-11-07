@@ -141,7 +141,7 @@ export default function UserPaymentsPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen">
       <div className="max-w-5xl mx-auto p-6 space-y-8">
         {/* Header Section */}
         <div className="text-center space-y-4 mb-12">
@@ -219,7 +219,7 @@ export default function UserPaymentsPage({
                   className={`w-full transition-colors duration-300
                     ${processingPayment && selectedPlan === plan.id ?
                       'bg-zinc-700' :
-                      'bg-zinc-100 text-zinc-900 hover:bg-zinc-200'
+                      'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1'
                     }`}
                   onClick={() => handlePaymentSubmission(plan)}
                   disabled={processingPayment}
