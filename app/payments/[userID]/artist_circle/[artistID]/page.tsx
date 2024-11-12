@@ -105,9 +105,10 @@ export default function UserPaymentsPage({
       if (!pesapalResponse.success || !pesapalResponse.redirect_url) {
         throw new Error(pesapalResponse.error || 'Failed to get payment URL');
       }
+      setRedirectUrl(pesapalResponse.redirect_url || null);
 
       // Immediate redirect
-      window.location.href = pesapalResponse.redirect_url;
+      // window.location.href = pesapalResponse.redirect_url;
     } catch (error) {
       console.error('Payment submission error:', error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
