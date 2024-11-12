@@ -126,7 +126,7 @@ export default function UserPaymentsPage({
     if (redirectUrl) {
       const timer = setTimeout(() => {
         window.location.href = redirectUrl;
-      }, 2000);
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [redirectUrl]);
