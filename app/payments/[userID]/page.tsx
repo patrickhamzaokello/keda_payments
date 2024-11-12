@@ -78,7 +78,7 @@ export default function UserPaymentsPage({
         branch: "Mwonya Payments- HQ",
         billing_address: {
           email_address: userDetails?.email ?? "",
-          phone_number: "0723xxxxxx",
+          phone_number: "xxxxxx",
           country_code: "UG",
           first_name: userDetails?.firstName ?? "",
           last_name: userDetails?.lastName ?? "",
@@ -86,10 +86,10 @@ export default function UserPaymentsPage({
         }
       };
 
-      const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData);
-      if (!mwonyaResponse.success) {
-        throw new Error(mwonyaResponse.error || 'Mwonya payment failed');
-      }
+      // const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData);
+      // if (!mwonyaResponse.success) {
+      //   throw new Error(mwonyaResponse.error || 'Mwonya payment failed');
+      // }
 
       const pesapalResponse = await handlePaymentRequest(paymentRequestData);
       if (!pesapalResponse.success) {

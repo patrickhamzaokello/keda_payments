@@ -77,13 +77,13 @@ export default function UserPaymentsPage({
         id: created_order_id,
         currency: "UGX",
         amount: parseFloat(amountString??""),
-        description: `${artistDetails?.name} artist circle subscription by ${userID} `,
+        description: `${artistDetails?.name} artist circle subscription `,
         callback_url: "https://payments.mwonya.com/confirm_payment",
         notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
         branch: "Mwonya Payments- HQ",
         billing_address: {
           email_address: "Email",
-          phone_number: "0723xxxxxx",
+          phone_number: "xxxxxx",
           country_code: "UG",
           first_name: "first name",
           last_name: "last name",
@@ -91,11 +91,11 @@ export default function UserPaymentsPage({
         }
       };
 
-      const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData)
-      if (!mwonyaResponse.success) {
-        setError(mwonyaResponse.error || 'Failed to post to mwonya');
-        return; 
-      }
+      // const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData)
+      // if (!mwonyaResponse.success) {
+      //   setError(mwonyaResponse.error || 'Failed to post to mwonya');
+      //   return; 
+      // }
       const pesapalResponse = await handlePaymentRequest(paymentRequestData);
       if (!pesapalResponse.success) {
         setError(pesapalResponse.error || 'Failed to post to pesapal');
