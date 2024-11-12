@@ -136,7 +136,7 @@ export default function UserPaymentsPage({
 
   useEffect(() => {
     if (redirectUrl) {
-      window.location.href = redirectUrl;
+      window.location.replace(redirectUrl);
     }
   }, [redirectUrl]);
 

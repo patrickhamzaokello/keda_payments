@@ -133,7 +133,7 @@ export default function UserPaymentsPage({
   useEffect(() => {
     if (redirectUrl) {
       const timer = setTimeout(() => {
-        window.location.href = redirectUrl;
+        window.location.replace(redirectUrl);
       }, 500);
       return () => clearTimeout(timer);
     }
