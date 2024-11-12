@@ -85,18 +85,26 @@ export default function UserPaymentsPage({
           line_1: "Kampala, uganda",
         }
       };
+      
+      // Execute both requests concurrently
+      const [mwonyaResponse, pesapalResponse] = await Promise.all([
+        postMwonyaOrder(mwonyaPaymentData),
+        handlePaymentRequest(paymentRequestData)
+      ]);
 
-      // const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData);
-      // if (!mwonyaResponse.success) {
-      //   throw new Error(mwonyaResponse.error || 'Mwonya payment failed');
-      // }
-
-      const pesapalResponse = await handlePaymentRequest(paymentRequestData);
-      if (!pesapalResponse.success) {
-        throw new Error(pesapalResponse.error || 'Pesapal payment failed');
+      // Check responses and handle errors
+      if (!mwonyaResponse.success) {
+        throw new Error(mwonyaResponse.error || 'Failed to post to mwonya');
       }
 
-      setRedirectUrl(pesapalResponse.redirect_url || null);
+      if (!pesapalResponse.success || !pesapalResponse.redirect_url) {
+        throw new Error(pesapalResponse.error || 'Failed to get payment URL');
+      }
+
+      // Immediate redirect
+      window.location.href = pesapalResponse.redirect_url;
+
+      // setRedirectUrl(pesapalResponse.redirect_url || null);
     } catch (error) {
       console.error('Payment error:', error);
       setError(error instanceof Error ? error.message : 'Payment processing failed');

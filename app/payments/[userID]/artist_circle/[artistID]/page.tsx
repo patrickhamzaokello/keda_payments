@@ -1,12 +1,12 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { PaymentOrderRequest,MwonyaPaymentDetails, ArtistCircleDetails } from "@/types/payment";
+import { PaymentOrderRequest, MwonyaPaymentDetails, ArtistCircleDetails } from "@/types/payment";
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, AlertCircle, Loader, Users, Calendar, Star, Trophy } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Decimal from 'decimal.js';
-import { fetchArtistDetails, handlePaymentRequest,postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
+import { fetchArtistDetails, handlePaymentRequest, postMwonyaOrder } from '@/app/actions/payments/handlePaymentRequest';
 import Image from 'next/image';
 
 interface ProductDetails {
@@ -33,7 +33,7 @@ export default function UserPaymentsPage({
 
   const productDetails: ProductDetails = {
     name: "Artist Circle Subscription",
-    price: parseFloat(amountString??""),
+    price: parseFloat(amountString ?? ""),
     currency: "UGX",
     description: "Show Support to the Artist you love, Enjoy Artist Exclusive features"
   };
@@ -64,19 +64,19 @@ export default function UserPaymentsPage({
       const mwonyaPaymentData: MwonyaPaymentDetails = {
         merchant_reference: created_order_id,
         userId: userID,
-        amount: parseFloat(amountString??""),
+        amount: parseFloat(amountString ?? ""),
         currency: "UGX",
         subscriptionType: "artist_circle",
         subscriptionTypeId: artistID,
         paymentCreatedDate: new Date().toISOString(),
-        planDuration: artistDetails?.circle_duration?? 0,
+        planDuration: artistDetails?.circle_duration ?? 0,
         planDescription: `${artistDetails?.name} artist circle subscription`
       };
 
       const paymentRequestData: PaymentOrderRequest = {
         id: created_order_id,
         currency: "UGX",
-        amount: parseFloat(amountString??""),
+        amount: parseFloat(amountString ?? ""),
         description: `${artistDetails?.name} artist circle subscription `,
         callback_url: "https://payments.mwonya.com/confirm_payment",
         notification_id: "e523e059-f93b-43ef-9e2b-dd2fb3d7497e",
@@ -91,17 +91,23 @@ export default function UserPaymentsPage({
         }
       };
 
-      // const mwonyaResponse = await postMwonyaOrder(mwonyaPaymentData)
-      // if (!mwonyaResponse.success) {
-      //   setError(mwonyaResponse.error || 'Failed to post to mwonya');
-      //   return; 
-      // }
-      const pesapalResponse = await handlePaymentRequest(paymentRequestData);
-      if (!pesapalResponse.success) {
-        setError(pesapalResponse.error || 'Failed to post to pesapal');
-        return; 
-      } 
-      setRedirectUrl(pesapalResponse.redirect_url || null);
+      // Execute both requests concurrently
+      const [mwonyaResponse, pesapalResponse] = await Promise.all([
+        postMwonyaOrder(mwonyaPaymentData),
+        handlePaymentRequest(paymentRequestData)
+      ]);
+
+      // Check responses and handle errors
+      if (!mwonyaResponse.success) {
+        throw new Error(mwonyaResponse.error || 'Failed to post to mwonya');
+      }
+
+      if (!pesapalResponse.success || !pesapalResponse.redirect_url) {
+        throw new Error(pesapalResponse.error || 'Failed to get payment URL');
+      }
+
+      // Immediate redirect
+      window.location.href = pesapalResponse.redirect_url;
     } catch (error) {
       console.error('Payment submission error:', error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
@@ -154,7 +160,7 @@ export default function UserPaymentsPage({
       </Alert>
     );
   }
-// validate artist
+  // validate artist
   if (!artistID?.match(/^martist[a-zA-Z0-9]+$/)) {
     return (
       <Alert variant="destructive">
@@ -166,7 +172,7 @@ export default function UserPaymentsPage({
     );
   }
 
-  if(!isValidAmount(amountString)){
+  if (!isValidAmount(amountString)) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
@@ -180,7 +186,7 @@ export default function UserPaymentsPage({
   return (
     <div className="min-h-screen py-0">
       <div className="max-w-xl mx-auto">
-        
+
 
         {/* Checkout Card */}
         <Card className="bg-zinc-900/50 backdrop-blur-lg border-zinc-800/50">
@@ -207,10 +213,10 @@ export default function UserPaymentsPage({
                     {formattedPrice}
                   </div>
                 </div>
-                
+
                 {/* Added benefits list */}
                 <ul className="space-y-2 mt-4">
-                  
+
                   <li className="flex items-center gap-2 text-sm text-zinc-300">
                     <CheckCircle className="w-4 h-4 text-emerald-400" />
                     Exclusive content and releases
@@ -278,7 +284,7 @@ export default function UserPaymentsPage({
               {/* Decorative background elements */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
-              
+
               <div className="relative">
                 <div className="flex items-start gap-6">
                   <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-zinc-800 ring-2 ring-zinc-700/50">
@@ -289,7 +295,7 @@ export default function UserPaymentsPage({
                       className="object-cover"
                     />
                   </div>
-                  
+
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
                       <h2 className="text-xl font-semibold text-zinc-100">
@@ -302,9 +308,9 @@ export default function UserPaymentsPage({
                         </span>
                       )}
                     </div>
-                    
+
                     <p className="text-sm text-zinc-400">{artistDetails.genre}</p>
-                    
+
                     {/* Engagement metrics */}
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-1 text-zinc-300">
@@ -318,7 +324,7 @@ export default function UserPaymentsPage({
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Value proposition cards */}
                 <div className="grid grid-cols-2 gap-4 mt-6">
                   <div className="bg-zinc-800/30 rounded-xl p-4 border border-zinc-700/30">
