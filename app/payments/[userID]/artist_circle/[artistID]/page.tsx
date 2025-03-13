@@ -162,16 +162,16 @@ export default function UserPaymentsPage({
     );
   }
   // validate artist
-  if (!artistID?.match(/^martist[a-zA-Z0-9]+$/)) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Invalid Aritst ID format. Please check the URL and try again.
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  // if (!artistID?.match(/^martist[a-zA-Z0-9]+$/)) {
+  //   return (
+  //     <Alert variant="destructive">
+  //       <AlertCircle className="h-4 w-4" />
+  //       <AlertDescription>
+  //         Invalid Aritst ID format. Please check the URL and try again.
+  //       </AlertDescription>
+  //     </Alert>
+  //   );
+  // }
 
   if (!isValidAmount(amountString)) {
     return (
